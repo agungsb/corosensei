@@ -96,6 +96,14 @@ cfg_if::cfg_if! {
         unsafe fn valgrind_request(default: Value, _args: &[Value; 6]) -> Value {
             default
         }
+    } else if #[cfg(target_arch = "s390x")] {
+        type Value = usize;
+
+        // Valgrind support for s390x is not implemented, use a no-op for now.
+        #[inline]
+        unsafe fn valgrind_request(default: Value, _args: &[Value; 6]) -> Value {
+            default
+        }
     } else {
         compile_error!("Unsupported target");
     }
@@ -144,3 +152,4 @@ impl Drop for ValgrindStackRegistration {
         }
     }
 }
+
