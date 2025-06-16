@@ -146,20 +146,19 @@ global_asm!(
     // - r2 contains the argument to be passed to the function.
     //
     // Create a stack frame and save registers.
-    "stmg    %r13,%r14,-16(%r15)",   // Save r13-r14 to stack
-    "aghi    %r15,-16",             // Allocate stack frame
-    "lgr     %r13,%r15",             // Set up frame pointer
-    ".cfi_def_cfa r13, 16",
-    ".cfi_offset r14, -8",
-    ".cfi_offset r13, -16",
+    "stg     %r13,-8(%r15)",         // Save frame pointer
+    "aghi    %r15,-8",              // Allocate space (like push)
+    "lgr     %r13,%r15",             // Set frame pointer = current SP
+    ".cfi_def_cfa r13, 8",
+    ".cfi_offset r13, -8",
     // Switch to the new stack.
     "lgr     %r15,%r3",              // Switch to new stack
     // Call the function pointer. The argument is already in r2.
     "basr    %r14,%r4",             // Call function
     // Switch back to the original stack and restore registers.
     "lgr     %r15,%r13",             // Restore original stack
-    "lmg     %r13,%r14,0(%r15)",   // Restore r13-r14
-    "aghi    %r15,16",              // Restore stack pointer
+    "lg      %r13,0(%r15)",          // Restore frame pointer (like pop)
+    "aghi    %r15,8",               // Adjust SP
     "br      %r14",                  // Return
     ".cfi_endproc",
     asm_function_end!("stack_call_trampoline"),
