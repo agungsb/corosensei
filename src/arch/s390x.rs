@@ -146,10 +146,10 @@ global_asm!(
     // - r2 contains the argument to be passed to the function.
     //
     // Create a stack frame and save registers.
-    "stmg    %r13,%r14,104(%r15)",   // Save r13-r14 to stack
-    "aghi    %r15,-160",             // Allocate stack frame
+    "stmg    %r13,%r14,-16(%r15)",   // Save r13-r14 to stack
+    "aghi    %r15,-16",             // Allocate stack frame
     "lgr     %r13,%r15",             // Set up frame pointer
-    ".cfi_def_cfa r13, 160",
+    ".cfi_def_cfa r13, 16",
     ".cfi_offset r14, -8",
     ".cfi_offset r13, -16",
     // Switch to the new stack.
@@ -158,8 +158,8 @@ global_asm!(
     "basr    %r14,%r4",             // Call function
     // Switch back to the original stack and restore registers.
     "lgr     %r15,%r13",             // Restore original stack
-    "lmg     %r13,%r14,104(%r15)",   // Restore r13-r14
-    "aghi    %r15,160",              // Restore stack pointer
+    "lmg     %r13,%r14,0(%r15)",   // Restore r13-r14
+    "aghi    %r15,16",              // Restore stack pointer
     "br      %r14",                  // Return
     ".cfi_endproc",
     asm_function_end!("stack_call_trampoline"),
