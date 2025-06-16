@@ -1,7 +1,7 @@
 on:
   push:
     branches:
-      - master
+      - s390x-full
   pull_request:
 
 env:
@@ -11,7 +11,7 @@ jobs:
   test:
     runs-on: ${{ matrix.os }}
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - uses: actions-rs/toolchain@v1
       with:
         toolchain: ${{ matrix.target == 'i686-pc-windows-gnu' && format('{0}-i686-pc-windows-gnu', matrix.channel) || matrix.channel }}
@@ -46,6 +46,7 @@ jobs:
           i686-pc-windows-gnu,
           i686-pc-windows-msvc,
           loongarch64-unknown-linux-gnu,
+          s390x-unknown-linux-gnu,
         ]
         channel: [stable, nightly]
         include:
@@ -78,4 +79,6 @@ jobs:
         - target: i686-pc-windows-gnu
           os: windows-latest
         - target: loongarch64-unknown-linux-gnu
+          os: ubuntu-latest
+        - target: s390x-unknown-linux-gnu
           os: ubuntu-latest

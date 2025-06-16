@@ -1,0 +1,55 @@
+name: s390x Release
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:  # Allow manual triggering
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  s390x-release-build:
+    name: Build s390x Release Artifacts
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Install Rust toolchain
+      uses: actions-rs/toolchain@v1
+      with:
+        toolchain: stable
+        target: s390x-unknown-linux-gnu
+        override: true
+    
+    - name: Install cross-compilation tools
+      run: |
+        cargo install cross --git https://github.com/cross-rs/cross --rev 4090beca3cfffa44371a5bba524de3a578aa46c3
+    
+    - name: Build release artifacts
+      run: |
+        cross build --target s390x-unknown-linux-gnu --release --all-features
+        cross build --target s390x-unknown-linux-gnu --release --no-default-features --features default-stack
+    
+    - name: Package artifacts
+      run: |
+        mkdir -p artifacts/s390x
+        cp target/s390x-unknown-linux-gnu/release/libcorosensei.rlib artifacts/s390x/
+        cp Cargo.toml artifacts/s390x/
+        cp README.md artifacts/s390x/
+        
+        # Create a tarball
+        tar -czf corosensei-s390x-release.tar.gz -C artifacts s390x/
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v3
+      with:
+        name: corosensei-s390x-${{ github.ref_name }}
+        path: corosensei-s390x-release.tar.gz
+    
+    - name: Verify build
+      run: |
+        echo "✅ s390x release build completed successfully"
+        ls -la target/s390x-unknown-linux-gnu/release/
+        file target/s390x-unknown-linux-gnu/release/libcorosensei.rlib
