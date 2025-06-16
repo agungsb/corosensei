@@ -578,13 +578,13 @@ mod trap_handler {
                     context.uc_mcontext.__gregs[22] = fp;
                 // ADDED: s390x support for setting registers after a trap.
                 } else if #[cfg(all(target_os = "linux", target_arch = "s390x"))] {
-                    let TrapHandlerRegs { psw_addr, g15, g11, g14, g2, g3 } = regs;
-                    context.uc_mcontext.psw.addr = psw_addr;
-                    context.uc_mcontext.gregs[15] = g15;
-                    context.uc_mcontext.gregs[11] = g11;
-                    context.uc_mcontext.gregs[14] = g14;
-                    context.uc_mcontext.gregs[2] = g2;
-                    context.uc_mcontext.gregs[3] = g3;
+                    let TrapHandlerRegs { pc, sp, r11, r14, r2, r3 } = regs;
+                    context.uc_mcontext.psw.addr = pc;
+                    context.uc_mcontext.gregs[15] = sp;
+                    context.uc_mcontext.gregs[11] = r11;
+                    context.uc_mcontext.gregs[14] = r14;
+                    context.uc_mcontext.gregs[2] = r2;
+                    context.uc_mcontext.gregs[3] = r3;
                 } else {
                     compile_error!("Unsupported platform");
                 }

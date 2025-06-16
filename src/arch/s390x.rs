@@ -67,7 +67,7 @@
 //! +------------------+  <- Initial stack pointer
 //! ```
 
-use core::arch::{asm, global_asm};
+use core::arch::global_asm;
 
 use super::{allocate_obj_on_stack, push};
 use crate::stack::{Stack, StackPointer};
@@ -86,6 +86,7 @@ pub type StackWord = u64;
 // Registers r6-r13 are callee-saved. We must also save r14 (link register)
 // and r15 (stack pointer). This makes for 10 registers total.
 // Each register is 8 bytes.
+#[allow(dead_code)]
 const SAVED_REGS_SIZE: usize = 10 * 8;
 
 global_asm!(
@@ -215,7 +216,7 @@ pub unsafe fn switch_and_link(
 }
 
 #[inline(always)]
-pub unsafe fn switch_yield(arg: EncodedValue, parent_link: *mut StackPointer) -> EncodedValue {
+pub unsafe fn switch_yield(_arg: EncodedValue, _parent_link: *mut StackPointer) -> EncodedValue {
     // This function needs to be implemented for full context switching.
     // For now, we will panic as it is a complex piece of assembly.
     // A proper implementation would save the current state and jump to the parent.
@@ -223,7 +224,7 @@ pub unsafe fn switch_yield(arg: EncodedValue, parent_link: *mut StackPointer) ->
 }
 
 #[inline(always)]
-pub unsafe fn switch_and_reset(arg: EncodedValue, parent_link: *mut StackPointer) -> ! {
+pub unsafe fn switch_and_reset(_arg: EncodedValue, _parent_link: *mut StackPointer) -> ! {
     // This function needs to be implemented for full context switching.
     // For now, we will panic as it is a complex piece of assembly.
     // A proper implementation would switch to the parent context and not return.
