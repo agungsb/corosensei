@@ -96,18 +96,18 @@ global_asm!(
     //
     // Save the r13, r6 and r14 values of the parent context onto the parent
     // stack.
-    "stmg    %r6,%r14,48(%r15)",     // Save r6-r14 to parent stack
-    "aghi    %r15,-64",              // Allocate stack frame
+    "stmg    %r6,%r14,48(%r15)", // Save r6-r14 to parent stack
+    "aghi    %r15,-64",          // Allocate stack frame
     // Write the parent stack pointer to the parent link and adjust r3 to point
     // to the parent link.
-    "la      %r1,64(%r15)",          // Get parent stack pointer
-    "stg     %r1,-16(%r3)",          // Store to parent link
-    "aghi    %r3,-16",               // Adjust r3 to point to parent link
+    "la      %r1,64(%r15)", // Get parent stack pointer
+    "stg     %r1,-16(%r3)", // Store to parent link
+    "aghi    %r3,-16",      // Adjust r3 to point to parent link
     // Switch to the coroutine stack.
-    "lgr     %r15,%r4",              // Switch to coroutine stack
-    "aghi    %r15,8",                // Skip initial r14 value
+    "lgr     %r15,%r4", // Switch to coroutine stack
+    "aghi    %r15,8",   // Skip initial r14 value
     // Set up the frame pointer to point at the parent link.
-    "lgr     %r13,%r3",              // r13 = parent link pointer
+    "lgr     %r13,%r3", // r13 = parent link pointer
     // Define CFA for unwinding
     // 0x0f: DW_CFA_def_cfa_expression
     // 5: byte length of the following DWARF expression
@@ -122,13 +122,13 @@ global_asm!(
     ".cfi_offset r13, -24",
     // Set up the 3rd argument to the initial function to point to the object
     // that init_stack() set up on the stack.
-    "lgr     %r4,%r15",              // r4 = stack pointer (3rd arg)
+    "lgr     %r4,%r15", // r4 = stack pointer (3rd arg)
     // Call the initial function. r2 is already the first argument.
-    "lg      %r1,8(%r3)",            // Load initial function address
-    "basr    %r14,%r1",             // Call initial function
+    "lg      %r1,8(%r3)", // Load initial function address
+    "basr    %r14,%r1",   // Call initial function
     // This point should never be reached in normal execution
     asm_function_alt_entry!("stack_init_trampoline_return"),
-    ".short  0x0000",             // Trigger program check (should not reach here)
+    ".short  0x0000", // Trigger program check (should not reach here)
     ".cfi_endproc",
     asm_function_end!("stack_init_trampoline"),
 );
@@ -146,23 +146,23 @@ global_asm!(
     // - r2 contains the argument to be passed to the function.
     //
     // Create a stack frame and save registers.
-    "stg     %r14,-8(%r15)",         // Save return address
-    "stg     %r13,-16(%r15)",         // Save frame pointer
-    "aghi    %r15,-16",              // Allocate space (like push)
-    "lgr     %r13,%r15",             // Set frame pointer
+    "stg     %r14,-8(%r15)",  // Save return address
+    "stg     %r13,-16(%r15)", // Save frame pointer
+    "aghi    %r15,-16",       // Allocate space (like push)
+    "lgr     %r13,%r15",      // Set frame pointer
     ".cfi_def_cfa r13, 16",
     ".cfi_offset r13, -16",
     ".cfi_offset r14, -8",
     // Switch to the new stack.
-    "lgr     %r15,%r3",              // Switch to new stack
+    "lgr     %r15,%r3", // Switch to new stack
     // Call the function pointer. The argument is already in r2.
-    "basr    %r14,%r4",             // Call function
+    "basr    %r14,%r4", // Call function
     // Switch back to the original stack and restore registers.
-    "lgr     %r15,%r13",             // Restore original stack
-    "lg      %r14,8(%r15)",          // Restore return address
-    "lg      %r13,0(%r15)",          // Restore frame pointer (like pop)
-    "aghi    %r15,16",               // Restore stack pointer
-    "br      %r14",                  // Return
+    "lgr     %r15,%r13",    // Restore original stack
+    "lg      %r14,8(%r15)", // Restore return address
+    "lg      %r13,0(%r15)", // Restore frame pointer (like pop)
+    "aghi    %r15,16",      // Restore stack pointer
+    "br      %r14",         // Return
     ".cfi_endproc",
     asm_function_end!("stack_call_trampoline"),
 );
